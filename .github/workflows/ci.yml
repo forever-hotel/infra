@@ -1,0 +1,25 @@
+name: Infrastructure checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm test
+      - name: Validate deployment Compose without real secrets
+        run: |
+          mkdir -p env
+          for template in env/*.env.example; do cp "$template" "${template%.example}"; done
+          EDGE_NETWORK=ci-placeholder RABBITMQ_IMAGE=rabbitmq:4-alpine docker compose -f compose.yml config --quiet
+      - name: Validate release when present
+        run: |
+          if test -f releases/staging.json; then npm run validate; fi

@@ -1,0 +1,7 @@
+.env
+*.local.*
+env/*.env
+state/
+node_modules/
+release-report.json
+host.json

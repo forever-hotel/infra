@@ -1,0 +1,92 @@
+name: Deploy shared staging
+on:
+  push:
+    branches: [development]
+    paths: ['releases/staging.json']
+  workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: First installation only; no existing application containers permitted
+        type: boolean
+        default: false
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+concurrency:
+  group: forever-hotel-full-staging
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require current deployment branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$GITHUB_REF" = refs/heads/development
+          current=$(gh api "repos/$GITHUB_REPOSITORY/branches/development" --jq .commit.sha)
+          test "$current" = "$GITHUB_SHA"
+      - run: npm test
+      - run: npm run validate
+      - name: Verify reviewed source and exact-commit CI
+        env:
+          GH_READ_TOKEN: ${{ secrets.DEPLOY_READ_TOKEN || github.token }}
+        run: node scripts/verify-github.mjs
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: staging
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install dedicated deployment identity
+        env:
+          DEPLOY_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          HOST_KEYS: ${{ secrets.STAGING_SSH_KNOWN_HOSTS }}
+        run: |
+          test -n "$DEPLOY_KEY" && test -n "$HOST_KEYS"
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$HOST_KEYS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+      - name: Transfer reviewed tooling and deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STAGING_HOST: ${{ vars.STAGING_HOST }}
+          STAGING_USER: ${{ vars.STAGING_USER }}
+          STAGING_PORT: ${{ vars.STAGING_PORT || '22' }}
+          BOOTSTRAP: ${{ github.event_name == 'workflow_dispatch' && inputs.bootstrap && 'true' || 'false' }}
+        run: |
+          set -euo pipefail
+          [[ "$STAGING_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ ]]
+          [[ "$STAGING_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
+          [[ "$STAGING_PORT" =~ ^[0-9]{1,5}$ ]]
+          [[ "$GITHUB_SHA" =~ ^[a-f0-9]{40}$ ]]
+          current=$(gh api "repos/$GITHUB_REPOSITORY/branches/development" --jq .commit.sha)
+          test "$current" = "$GITHUB_SHA"
+          directory="/opt/forever-hotel/infra-releases/$GITHUB_SHA"
+          tar -czf "$RUNNER_TEMP/infra-release.tgz" compose.yml scripts releases/staging.json
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -p "$STAGING_PORT" "$STAGING_USER@$STAGING_HOST" "mkdir -p '$directory'"
+          scp -o BatchMode=yes -o StrictHostKeyChecking=yes -P "$STAGING_PORT" "$RUNNER_TEMP/infra-release.tgz" "$STAGING_USER@$STAGING_HOST:$directory/bundle.tgz"
+          bootstrap=''
+          if test "$BOOTSTRAP" = true; then bootstrap='--bootstrap'; fi
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -p "$STAGING_PORT" "$STAGING_USER@$STAGING_HOST" "tar -xzf '$directory/bundle.tgz' -C '$directory' && cd '$directory' && node scripts/release.mjs deploy releases/staging.json $bootstrap"
+      - name: Remove runner SSH identity
+        if: always()
+        run: rm -f ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+      - name: Retain requested immutable release inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: requested-release-${{ github.sha }}
+          path: releases/staging.json
+          if-no-files-found: error

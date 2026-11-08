@@ -272,6 +272,36 @@ Images and immutable references appear in Actions job summaries and the
 `release-images` artifact. Allow organization package publication and configure
 server pull access separately. No personal publishing token is needed.
 
+### Confirmed gateway and WebSocket addresses
+
+Internal canonical URLs are `http://gateway:8080` and `http://websocket:8081`.
+Gateway also has edge-network alias `shared-gateway` for the sample transition.
+No separate public gateway/socket DNS or ports 8080/8081 are needed. Caddy forwards
+API paths and `/realtime/socket.io` on each public frontend hostname to the gateway.
+For MAD this is `https://forever-hotel-manager.duckdns.org`; the socket transport
+is `/realtime/socket.io` on that host. Staff/guest frontend origins are now filled
+in the example runtime files and WebSocket registry for MAD/FDS/WMS/FOSS.
+
+With same-origin routing, source repository variables should be:
+
+| Repository | PUBLIC_API_ORIGIN and PUBLIC_SOCKET_ORIGIN |
+| --- | --- |
+| front-desk | https://forever-hotel-frontdesk.duckdns.org |
+| worker-management | https://forever-hotel-workers.duckdns.org |
+| food-ordering | https://forever-hotel-food.duckdns.org |
+
+These hosts must forward their API prefix and realtime route to the same gateway.
+The example gateway CORS list contains these confirmed origins plus MAD. Add HW's
+confirmed public origin before using direct browser API traffic from HW; its
+current public hostname remains unconfirmed in the example smoke file.
+The example readiness URLs use the manager hostname; coordinator must verify
+that Caddy forwards `/health/ready` and `/realtime/health/ready` as intended before
+activating CD. API/socket connectivity alone does not establish public readiness
+route exposure. Retire any old owner of `shared-gateway` on the edge network before
+starting the new gateway; do not give two active containers the same transition alias.
+Only examples are changed here: private VM env files, GitHub repository variables,
+DNS records and live Caddy routing are not modified by editing this repository.
+
 ## Ubuntu installation commands
 
 Run these in the existing VM's SSH terminal, not Windows PowerShell. First check

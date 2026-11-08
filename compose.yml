@@ -62,6 +62,7 @@ services:
       edge:
         aliases:
         - forever-gateway
+        - shared-gateway
     healthcheck:
       test:
       - CMD

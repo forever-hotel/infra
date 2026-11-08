@@ -122,3 +122,13 @@ test('release gate checks infra and all source repositories', async () => {
   await verifyRelease(async route => { routes.push(route); return api(route); }, manifest(), 'a'.repeat(40));
   assert.equal(routes.filter(route => route.includes('/commits/')).length, 8);
 });
+
+for (const repo of ['front-desk', 'hotel-website']) {
+  test(`${repo} release requires successful publication, not just quality checks`, async () => {
+    const fixture = githubFixture();
+    const api = async route => route.includes('/actions/workflows/publish-images.yml/')
+      ? { workflow_runs: [{ id: 2, conclusion: 'failure' }] }
+      : fixture(route);
+    await assert.rejects(verifySource(api, repo, 'a'.repeat(40), 'develop'), /publish-images.yml/);
+  });
+}

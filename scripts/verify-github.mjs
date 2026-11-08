@@ -3,9 +3,9 @@ import { validateManifest, services } from './contracts.mjs';
 
 export const workflows = {
   'manager-dashboard': ['ci.yml'],
-  'front-desk': ['backend-ci.yml', 'frontend-ci.yml', 'docker-ci.yml'],
+  'front-desk': ['publish-images.yml'],
   'worker-management': ['ci.yml'],
-  'hotel-website': ['staging-sample.yml'],
+  'hotel-website': ['publish-images.yml'],
   'food-ordering': ['ci.yml'],
   'api-gateway': ['ci.yml'],
   'websocket-service': ['ci.yml'],

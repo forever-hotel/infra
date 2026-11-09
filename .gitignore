@@ -14,3 +14,10 @@ coverage/
 .infra-release/
 *.host.json
 *.host.draft.json
+.env
+*.local.*
+env/*.env
+state/
+node_modules/
+release-report.json
+host.json

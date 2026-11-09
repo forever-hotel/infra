@@ -1,0 +1,9 @@
+{
+  "repository": "forever-hotel/worker-management",
+  "branch": "develop",
+  "commit": "1a33059c0005752ca709ca91ab11067dc6cff55a",
+  "frontend": "ghcr.io/forever-hotel/worker-management/frontend@sha256:dfd289af71627ec0075cca21a305e205aafdf7b2301deecb5553a0a25b95c522",
+  "backend": "ghcr.io/forever-hotel/worker-management/backend@sha256:aa0a41b67a3c5bdc058f3689dd96cf36d5e17e4354c6782948c47af2d0e9bdc4",
+  "evidence": "User supplied successful publication summary; running image drift not independently checked.",
+  "deployment": "User reported HTTP connectivity; full functionality not verified"
+}

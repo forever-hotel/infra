@@ -1,0 +1,9 @@
+node_modules/
+reports/
+coverage/
+compose*.yml
+config/snapshots/Caddyfile*
+config/Caddyfile*
+env/
+.env*
+package-lock.json

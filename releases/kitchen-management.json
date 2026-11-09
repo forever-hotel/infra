@@ -1,0 +1,9 @@
+{
+  "repository": "forever-hotel/kitchen-management",
+  "branch": "develop",
+  "commit": "6d0004720628d39e0b1a1cfb9fbb18244df59357",
+  "frontend": "ghcr.io/forever-hotel/kitchen-management/frontend@sha256:aed29539527913eb04e98d3defe446e1abb06ead702bc4cf0b57155606605925",
+  "backend": "ghcr.io/forever-hotel/kitchen-management/backend@sha256:1f81d25f21603c91568b527bde9c0fd3d2d6500ed18ee12055a65ae3d98ba7e0",
+  "evidence": "User supplied successful publication summary; running image drift not independently checked.",
+  "deployment": "User reports readiness recovered after teammate schema change; broker login succeeds, gateway protected route 401, public root scaffold observed. Migration source, triggers and functional flows unverified."
+}

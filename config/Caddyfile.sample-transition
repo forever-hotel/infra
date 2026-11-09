@@ -1,0 +1,27 @@
+# Transition only: reuse the EXISTING sample Caddy and certificate volumes.
+(shared_gateway) {
+    reverse_proxy shared-gateway:8080 {
+        header_up X-Forwarded-For {remote_host}
+        header_up -X-User-Id
+        header_up -X-User-Role
+        header_up -X-Room-Number
+    }
+}
+forever-hotel-staging.malaysiawest.cloudapp.azure.com {
+    @hw path /hw /hw/*
+    handle @hw {
+        import shared_gateway
+    }
+    handle {
+        reverse_proxy hotel-website-frontend:3001
+    }
+}
+forever-hotel-manager.duckdns.org {
+    @mad path /auth /auth/* /mad /mad/* /realtime /realtime/*
+    handle @mad {
+        import shared_gateway
+    }
+    handle {
+        reverse_proxy mad-frontend:3000
+    }
+}

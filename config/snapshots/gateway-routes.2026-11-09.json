@@ -1,0 +1,75 @@
+[
+  {
+    "id": "shared-websocket",
+    "enabled": true,
+    "prefix": "/realtime",
+    "rewritePrefix": "",
+    "upstreamEnv": "WEBSOCKET_SERVICE_URL",
+    "websocket": true,
+    "cookieNames": []
+  },
+  {
+    "id": "mad-auth",
+    "enabled": true,
+    "prefix": "/mad/auth",
+    "rewritePrefix": "/auth",
+    "upstreamEnv": "MAD_SERVICE_URL",
+    "cookieNames": ["mad_session", "mad_csrf"]
+  },
+  {
+    "id": "mad",
+    "enabled": true,
+    "prefix": "/mad",
+    "rewritePrefix": "/mad",
+    "upstreamEnv": "MAD_SERVICE_URL",
+    "cookieNames": ["mad_session", "mad_csrf"]
+  },
+  {
+    "id": "hw",
+    "enabled": true,
+    "prefix": "/hw",
+    "rewritePrefix": "",
+    "upstreamEnv": "HW_SERVICE_URL",
+    "cookieNames": ["hw_session", "hw_csrf"]
+  },
+  {
+    "id": "fds",
+    "enabled": true,
+    "prefix": "/fds",
+    "rewritePrefix": "",
+    "upstreamEnv": "FDS_SERVICE_URL",
+    "cookieNames": ["fds_session", "fds_csrf"]
+  },
+  {
+    "id": "foss",
+    "enabled": true,
+    "prefix": "/foss",
+    "rewritePrefix": "/foss",
+    "upstreamEnv": "FOSS_SERVICE_URL",
+    "cookieNames": ["foss_session", "foss_csrf"]
+  },
+  {
+    "id": "kms",
+    "enabled": false,
+    "prefix": "/kms",
+    "rewritePrefix": "/kms",
+    "upstreamEnv": "KMS_SERVICE_URL",
+    "cookieNames": ["kms_session", "kms_csrf"]
+  },
+  {
+    "id": "wkms",
+    "enabled": true,
+    "prefix": "/wkms",
+    "rewritePrefix": "/wkms",
+    "upstreamEnv": "WKMS_SERVICE_URL",
+    "cookieNames": ["wkms_session", "wkms_csrf"]
+  },
+  {
+    "id": "wms",
+    "enabled": true,
+    "prefix": "/wms",
+    "rewritePrefix": "/wkms",
+    "upstreamEnv": "WKMS_SERVICE_URL",
+    "cookieNames": []
+  }
+]

@@ -1,0 +1,391 @@
+# JSON is valid YAML; generated as a reviewable Compose document.
+{
+  "name": "forever-hotel-full",
+  "services": {
+    "hw-backend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "hw"
+      ],
+      "image": "${HW_BACKEND_IMAGE:?Set HW_BACKEND_IMAGE}",
+      "env_file": [
+        "./env/hw-backend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "3000"
+      },
+      "expose": [
+        "3000"
+      ]
+    },
+    "hw-frontend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "hw"
+      ],
+      "image": "${HW_FRONTEND_IMAGE:?Set HW_FRONTEND_IMAGE}",
+      "env_file": [
+        "./env/hw-frontend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "3001"
+      },
+      "expose": [
+        "3001"
+      ]
+    },
+    "mad-backend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "mad"
+      ],
+      "image": "${MAD_BACKEND_IMAGE:?Set MAD_BACKEND_IMAGE}",
+      "env_file": [
+        "./env/mad-backend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "4000"
+      },
+      "expose": [
+        "4000"
+      ]
+    },
+    "mad-frontend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "mad"
+      ],
+      "image": "${MAD_FRONTEND_IMAGE:?Set MAD_FRONTEND_IMAGE}",
+      "env_file": [
+        "./env/mad-frontend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "3000"
+      },
+      "expose": [
+        "3000"
+      ]
+    },
+    "fds-backend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "fds"
+      ],
+      "image": "${FDS_BACKEND_IMAGE:?Set FDS_BACKEND_IMAGE}",
+      "env_file": [
+        "./env/fds-backend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "4001"
+      },
+      "expose": [
+        "4001"
+      ]
+    },
+    "fds-frontend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "fds"
+      ],
+      "image": "${FDS_FRONTEND_IMAGE:?Set FDS_FRONTEND_IMAGE}",
+      "env_file": [
+        "./env/fds-frontend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "3001"
+      },
+      "expose": [
+        "3001"
+      ]
+    },
+    "foss-backend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "foss"
+      ],
+      "image": "${FOSS_BACKEND_IMAGE:?Set FOSS_BACKEND_IMAGE}",
+      "env_file": [
+        "./env/foss-backend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "4300"
+      },
+      "expose": [
+        "4300"
+      ]
+    },
+    "foss-frontend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "foss"
+      ],
+      "image": "${FOSS_FRONTEND_IMAGE:?Set FOSS_FRONTEND_IMAGE}",
+      "env_file": [
+        "./env/foss-frontend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "3000"
+      },
+      "expose": [
+        "3000"
+      ]
+    },
+    "wkms-backend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "wkms"
+      ],
+      "image": "${WKMS_BACKEND_IMAGE:?Set WKMS_BACKEND_IMAGE}",
+      "env_file": [
+        "./env/wkms-backend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "3000"
+      },
+      "expose": [
+        "3000"
+      ]
+    },
+    "wkms-frontend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "wkms"
+      ],
+      "image": "${WKMS_FRONTEND_IMAGE:?Set WKMS_FRONTEND_IMAGE}",
+      "env_file": [
+        "./env/wkms-frontend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "3001"
+      },
+      "expose": [
+        "3001"
+      ]
+    },
+    "gateway": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "platform"
+      ],
+      "image": "${GATEWAY_IMAGE:?Set GATEWAY_IMAGE}",
+      "env_file": [
+        "./env/gateway.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "8080",
+        "HOST": "0.0.0.0",
+        "ROUTES_FILE": "/app/config/deployment-routes.json"
+      },
+      "expose": [
+        "8080"
+      ],
+      "volumes": [
+        "./config/gateway-routes.json:/app/config/deployment-routes.json:ro"
+      ]
+    },
+    "websocket": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "platform"
+      ],
+      "image": "${WEBSOCKET_IMAGE:?Set WEBSOCKET_IMAGE}",
+      "env_file": [
+        "./env/websocket.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "8081"
+      },
+      "expose": [
+        "8081"
+      ]
+    },
+    "rabbitmq": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "profiles": [
+        "platform"
+      ],
+      "image": "rabbitmq:4-management",
+      "env_file": [
+        "./env/rabbitmq.env"
+      ],
+      "volumes": [
+        "rabbitmq_data:/var/lib/rabbitmq"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "rabbitmq-diagnostics",
+          "-q",
+          "ping"
+        ],
+        "interval": "30s",
+        "timeout": "10s",
+        "retries": 5,
+        "start_period": "30s"
+      }
+    }
+  },
+  "networks": {
+    "services": {
+      "driver": "bridge"
+    }
+  },
+  "volumes": {
+    "rabbitmq_data": {}
+  }
+}

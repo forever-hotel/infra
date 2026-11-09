@@ -1,0 +1,11 @@
+{
+  "repository": "forever-hotel/manager-dashboard",
+  "branch": "development",
+  "commit": "8b2c63f459a93c217eb7cb502a2500e80181aa6e",
+  "pullRequest": 113,
+  "runNumber": 231,
+  "status": "images-published",
+  "verification": "User supplied successful GitHub Actions summary; Azure rollout not performed.",
+  "frontend": "ghcr.io/forever-hotel/manager-dashboard/frontend@sha256:b9f08f3e4e857c09ef4e7cb029f49db95055a357dd5b72ab12e3e9665344ba09",
+  "backend": "ghcr.io/forever-hotel/manager-dashboard/backend@sha256:b653fe95db2260aaa7bcd8dcf4b842ad11e4760a2b298a8d7b3c6ddb01ee9dcc"
+}

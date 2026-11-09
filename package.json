@@ -1,0 +1,21 @@
+{
+  "name": "forever-hotel-infra",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "lint": "eslint scripts test",
+    "validate": "node scripts/validate-config.mjs",
+    "test": "node --test",
+    "test:coverage": "node --experimental-test-coverage --test-coverage-include=scripts/validate-config.mjs --test-coverage-include=scripts/release-core.mjs --test-coverage-include=scripts/github-gate.mjs --test-coverage-include=scripts/deploy.mjs --test-coverage-include=scripts/adopt-host.mjs --test-coverage-lines=80 --test-coverage-branches=90 --test-coverage-functions=80 --test",
+    "format": "prettier --write \"*.md\" \"*.mjs\" \"*.json\" \"scripts/**/*.mjs\" \"test/**/*.mjs\" \"docs/**/*.md\" \"release/**/*.json\" \"releases/**/*.json\" \"config/**/*.json\" \".github/**/*.yml\"",
+    "format:check": "prettier --check \"*.md\" \"*.mjs\" \"*.json\" \"scripts/**/*.mjs\" \"test/**/*.mjs\" \"docs/**/*.md\" \"release/**/*.json\" \"releases/**/*.json\" \"config/**/*.json\" \".github/**/*.yml\"",
+    "build": "node --check scripts/deploy.mjs && node --check scripts/github-gate.mjs && node scripts/validate-config.mjs"
+  },
+  "devDependencies": {
+    "eslint": "9.39.5",
+    "prettier": "3.9.8"
+  }
+}

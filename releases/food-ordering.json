@@ -1,0 +1,9 @@
+{
+  "repository": "forever-hotel/food-ordering",
+  "branch": "develop",
+  "commit": "69ebc025d03f727e9e278eff727b72059a8a7fc6",
+  "frontend": "ghcr.io/forever-hotel/food-ordering/frontend@sha256:022d4adb2ab864063672ed12c68870fbfd0590198dd195f3f4f9d60720661bce",
+  "backend": "ghcr.io/forever-hotel/food-ordering/backend@sha256:d9568a490b9e4ce420e818cc71642493f01de4dbaa65ee62dad54d6966cc97f1",
+  "evidence": "User supplied successful publication summary; running image drift not independently checked.",
+  "deployment": "User reported HTTP connectivity; full functionality not verified"
+}

@@ -26,7 +26,9 @@ jobs:
       - run: npm run build
       - run: npm run validate
       - name: Shell syntax
-        run: bash -n scripts/remote-deploy.sh
+        run: |
+          bash -n scripts/remote-deploy.sh
+          bash -n .github/actions/deploy-service/remote-release.sh
       - name: Unit tests and coverage gates
         run: |
           set -euo pipefail

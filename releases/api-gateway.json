@@ -1,0 +1,9 @@
+{
+  "repository": "forever-hotel/api-gateway",
+  "branch": "develop",
+  "commit": "7c00d39edd4ac13755c83fb1a77e331115e5a666",
+  "image": "ghcr.io/forever-hotel/api-gateway@sha256:363eccf592b8d7f24487d2b1c76ea74e49f9cbac39b8bfc4d4fbf5f0bcc6f77d",
+  "runUrl": "https://github.com/forever-hotel/api-gateway/actions/runs/42482401068",
+  "status": "images-published",
+  "verification": "User supplied successful GitHub Actions summary. Not yet deployed by infra."
+}

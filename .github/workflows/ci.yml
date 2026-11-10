@@ -1,0 +1,145 @@
+name: Infra CI
+on:
+  push:
+  pull_request:
+    branches: [develop, main]
+permissions:
+  contents: read
+concurrency:
+  group: infra-ci-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-fund
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run validate
+      - name: Shell syntax
+        run: bash -n scripts/remote-deploy.sh
+      - name: Unit tests and coverage gates
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          npm run test:coverage | tee reports/coverage.txt
+      - name: Dependency security gate
+        run: npm audit --audit-level=high
+      - name: Compose validation with placeholders only
+        run: |
+          set -euo pipefail
+          for file in env/*.env.example; do cp "$file" "${file%.example}"; done
+          cp .env.example .env
+          docker compose --env-file .env -f compose.yml -f compose.sample-transition.yml -f compose.kms.yml --profile '*' config --quiet
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: infra-verification
+          path: reports/coverage.txt
+          if-no-files-found: warn
+          overwrite: true
+          retention-days: 14
+
+  staging:
+    name: Deploy reviewed staging manifest
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && vars.INFRA_STAGING_ENABLED == 'true'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    environment: staging
+    concurrency:
+      group: forever-hotel-staging-release
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24'
+      - name: Verify final-head peer approval
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/github-gate.mjs staging
+      - name: Deploy exact reviewed image manifest
+        env:
+          DEPLOY_ENVIRONMENT: staging
+          DEPLOY_HOST: ${{ vars.STAGING_HOST }}
+          DEPLOY_USER: ${{ vars.STAGING_USER }}
+          DEPLOY_DIRECTORY: ${{ vars.STAGING_DIRECTORY }}
+          SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.STAGING_KNOWN_HOSTS }}
+        run: bash scripts/remote-deploy.sh
+      - name: Retain tested staging release receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: staging-release-${{ github.run_id }}
+          path: reports/receipt.json
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 30
+
+  production:
+    name: Promote approved tagged production release
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.INFRA_PRODUCTION_ENABLED == 'true'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    environment: production
+    concurrency:
+      group: forever-hotel-production-release
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24'
+      - name: Verify SemVer tag and fetch staged receipt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          version=$(node -e 'const m=require("./release/current.json");if(!/^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/.test(m.version||""))process.exit(1);console.log(m.version)')
+          run_id=$(node -e 'const m=require("./release/current.json");if(!Number.isSafeInteger(m.stagingRunId)||m.stagingRunId<1)process.exit(1);console.log(m.stagingRunId)')
+          test "$(git rev-parse "refs/tags/v$version^{commit}")" = "$GITHUB_SHA"
+          gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name "staging-release-$run_id" --dir "$RUNNER_TEMP/staging-proof"
+      - name: Verify approved main merge, tested images and environment reviewers
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/github-gate.mjs production "$RUNNER_TEMP/staging-proof/receipt.json"
+      - name: Deploy exact staged images to the approved production host
+        env:
+          DEPLOY_ENVIRONMENT: production
+          DEPLOY_HOST: ${{ vars.PRODUCTION_HOST }}
+          DEPLOY_USER: ${{ vars.PRODUCTION_USER }}
+          DEPLOY_DIRECTORY: ${{ vars.PRODUCTION_DIRECTORY }}
+          SSH_PRIVATE_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.PRODUCTION_KNOWN_HOSTS }}
+        run: bash scripts/remote-deploy.sh
+      - name: Retain production receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: production-release-${{ github.run_id }}
+          path: reports/receipt.json
+          if-no-files-found: error
+          overwrite: true

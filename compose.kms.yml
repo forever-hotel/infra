@@ -1,0 +1,65 @@
+{
+  "services": {
+    "kms-backend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": [
+        "services"
+      ],
+      "profiles": [
+        "kms"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "image": "${KMS_BACKEND_IMAGE:?Set KMS_BACKEND_IMAGE}",
+      "env_file": [
+        "./env/kms-backend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "4005"
+      },
+      "expose": [
+        "4005"
+      ]
+    },
+    "kms-frontend": {
+      "restart": "unless-stopped",
+      "init": true,
+      "networks": {
+        "services": {},
+        "sample_edge": {
+          "aliases": [
+            "kms-frontend"
+          ]
+        }
+      },
+      "profiles": [
+        "kms"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "image": "${KMS_FRONTEND_IMAGE:?Set KMS_FRONTEND_IMAGE}",
+      "env_file": [
+        "./env/kms-frontend.env"
+      ],
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "3005"
+      },
+      "expose": [
+        "3005"
+      ]
+    }
+  }
+}

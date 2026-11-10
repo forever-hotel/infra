@@ -1,0 +1,49 @@
+name: Deploy reviewed service to staging
+description: Deploy the exact service images published by a reviewed release using the adopted staging VM.
+inputs:
+  service:
+    description: Allowlisted service profile
+    required: true
+  artifact:
+    description: Publication artifact from the current workflow run
+    required: true
+  host:
+    description: Approved staging hostname
+    required: true
+  user:
+    description: Authorized staging SSH user
+    required: true
+  ssh-key:
+    description: Encrypted staging SSH private key
+    required: true
+  known-hosts:
+    description: Independently verified SSH host entry
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Download and verify this run's reviewed image manifest
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GITHUB_TOKEN: ${{ github.token }}
+        SERVICE: ${{ inputs.service }}
+        ARTIFACT: ${{ inputs.artifact }}
+        ACTION_ROOT: ${{ github.action_path }}
+      run: |
+        set -euo pipefail
+        mkdir -p "$RUNNER_TEMP/service-release"
+        gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$ARTIFACT" --dir "$RUNNER_TEMP/service-release"
+        manifest="$RUNNER_TEMP/service-release/release-images.json"
+        if test ! -f "$manifest"; then manifest="$RUNNER_TEMP/service-release/release-image.json"; fi
+        node "$ACTION_ROOT/../../../scripts/verify-service-release.mjs" "$manifest" "$SERVICE"
+    - name: Deploy only the selected service and verify recovery status
+      shell: bash
+      env:
+        SERVICE: ${{ inputs.service }}
+        STAGING_HOST: ${{ inputs.host }}
+        STAGING_USER: ${{ inputs.user }}
+        SSH_PRIVATE_KEY: ${{ inputs.ssh-key }}
+        SSH_KNOWN_HOSTS: ${{ inputs.known-hosts }}
+        ACTION_ROOT: ${{ github.action_path }}
+      run: bash "$ACTION_ROOT/remote-release.sh"

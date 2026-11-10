@@ -21,7 +21,7 @@ trap 'rm -f -- "$ssh_dir/key" "$ssh_dir/known_hosts"' EXIT
 opts=(-i "$ssh_dir/key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$ssh_dir/known_hosts" -o ConnectTimeout=20)
 server="$DEPLOY_USER@$DEPLOY_HOST"
 incoming="$DEPLOY_DIRECTORY/.infra-release/incoming-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
-tar -czf "$RUNNER_TEMP/infra-release.tgz" scripts/deploy.mjs scripts/release-core.mjs release/current.json
+tar -czf "$RUNNER_TEMP/infra-release.tgz" scripts/deploy.mjs scripts/release-core.mjs scripts/service-release.mjs release/current.json
 ssh "${opts[@]}" "$server" "umask 077; mkdir -p '$incoming'"
 scp "${opts[@]}" "$RUNNER_TEMP/infra-release.tgz" "$server:$incoming/bundle.tgz"
 ssh "${opts[@]}" "$server" "tar -xzf '$incoming/bundle.tgz' -C '$incoming'; cd '$incoming'; node scripts/deploy.mjs deploy release/current.json '$DEPLOY_DIRECTORY/.infra-release/host.json' '$DEPLOY_ENVIRONMENT'"

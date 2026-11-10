@@ -10,12 +10,23 @@ concurrency:
   cancel-in-progress: false
 jobs:
   validate:
+    outputs:
+      release_changed: ${{ steps.release.outputs.changed }}
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+          fetch-depth: 2
+      - name: Detect full release manifest changes
+        id: release
+        run: |
+          if git rev-parse --verify HEAD^ >/dev/null 2>&1 && git diff --quiet HEAD^ HEAD -- release/current.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
           node-version: '24'
@@ -55,7 +66,7 @@ jobs:
   staging:
     name: Deploy reviewed staging manifest
     needs: validate
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && vars.INFRA_STAGING_ENABLED == 'true'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && vars.INFRA_STAGING_ENABLED == 'true' && needs.validate.outputs.release_changed == 'true'
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     environment: staging

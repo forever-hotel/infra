@@ -27,3 +27,5 @@ Database/schema changes still require owner coordination and compatibility revie
 ## Verification
 
 Watch the service repository's Actions run and Deploy service to staging job. PR runs validate but do not deploy. Approve the final service PR code and merge to the release branch, then confirm the publication, deployment and matching receipt. Test the changed business flow in the browser. First live rollout of these new callers remains pending their reviewed merges.
+
+Full-system staging rollout runs only when the reviewed infra merge changes release/current.json. Updating this shared action or its documentation alone validates the change without replacing containers.

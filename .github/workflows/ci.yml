@@ -12,6 +12,7 @@ jobs:
   validate:
     outputs:
       release_changed: ${{ steps.release.outputs.changed }}
+      cleanup_changed: ${{ steps.cleanup.outputs.changed }}
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     steps:
@@ -23,6 +24,14 @@ jobs:
         id: release
         run: |
           if git rev-parse --verify HEAD^ >/dev/null 2>&1 && git diff --quiet HEAD^ HEAD -- release/current.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Detect image cleanup installation changes
+        id: cleanup
+        run: |
+          if git rev-parse --verify HEAD^ >/dev/null 2>&1 && git diff --quiet HEAD^ HEAD -- scripts/image-retention.mjs scripts/remote-image-cleanup.sh config/hotel-image-cleanup.service config/hotel-image-cleanup.timer; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -39,6 +48,7 @@ jobs:
       - name: Shell syntax
         run: |
           bash -n scripts/remote-deploy.sh
+          bash -n scripts/remote-image-cleanup.sh
           bash -n .github/actions/deploy-service/remote-release.sh
       - name: Unit tests and coverage gates
         run: |
@@ -156,3 +166,35 @@ jobs:
           path: reports/receipt.json
           if-no-files-found: error
           overwrite: true
+
+  install-image-cleanup:
+    name: Install reviewed VM image retention timer
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && vars.VM_IMAGE_CLEANUP_ENABLED == 'true' && needs.validate.outputs.cleanup_changed == 'true'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    environment: staging
+    concurrency:
+      group: staging-image-cleanup-install
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24'
+      - name: Verify final-head peer approval
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/github-gate.mjs staging
+      - name: Preview policy and install daily VM timer
+        env:
+          STAGING_HOST: ${{ vars.STAGING_HOST }}
+          STAGING_USER: ${{ vars.STAGING_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.STAGING_KNOWN_HOSTS }}
+        run: bash scripts/remote-image-cleanup.sh

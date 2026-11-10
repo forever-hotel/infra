@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Forever Hotel application image cleanup
+
+[Timer]
+# 21:30 UTC = 03:00 Asia/Colombo the following day.
+OnCalendar=*-*-* 21:30:00 UTC
+Persistent=false
+Unit=hotel-image-cleanup.service
+
+[Install]
+WantedBy=timers.target

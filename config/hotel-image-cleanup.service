@@ -1,0 +1,13 @@
+[Unit]
+Description=Retain current and previous healthy Forever Hotel application images
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=azureuser
+UMask=0077
+Nice=10
+TimeoutStartSec=30min
+TimeoutStopSec=60
+ExecStart=/usr/bin/node /opt/forever-hotel/.infra-release/cleanup/image-retention.mjs --apply

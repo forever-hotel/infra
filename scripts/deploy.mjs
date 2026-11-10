@@ -1,3 +1,4 @@
+import { profiles } from './service-release.mjs';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
@@ -200,6 +201,26 @@ export function makeAdapter(
   };
 }
 
+export async function checkServiceReceipts(host, manifest) {
+  for (const service of Object.keys(profiles)) {
+    let receipt;
+    try {
+      receipt = await json(
+        resolve(host.stateDirectory, service + '-last-attempt.json'),
+      );
+    } catch (error) {
+      if (error.code === 'ENOENT') continue;
+      throw error;
+    }
+    if (receipt.status !== 'released') continue;
+    for (const name of profiles[service].services)
+      if (manifest.images[name] !== receipt.images?.[name])
+        throw Error(
+          'Full release conflicts with active service receipt; align the manifest first',
+        );
+  }
+}
+
 export async function main(
   args = process.argv.slice(2),
   adapterFactory = makeAdapter,
@@ -216,6 +237,7 @@ export async function main(
   if (/^pending/i.test(manifest.schemaEvidence.reviewedReference))
     throw Error('Record reviewed schema evidence before deployment');
   await checkConfig(host);
+  await checkServiceReceipts(host, manifest);
   const state = host.stateDirectory;
   await mkdir(state, { recursive: true, mode: 0o700 });
   const acquired = [];

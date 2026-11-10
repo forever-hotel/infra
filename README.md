@@ -1,7 +1,7 @@
 # Forever Hotel infrastructure
 
 [![Infra CI](https://github.com/forever-hotel/infra/actions/workflows/ci.yml/badge.svg)](https://github.com/forever-hotel/infra/actions/workflows/ci.yml)
-[![Coverage gate](https://img.shields.io/badge/new_code_gate-80%25_lines_90%25_branches-blue)](https://github.com/forever-hotel/infra/actions/workflows/ci.yml) 
+[![Coverage gate](https://img.shields.io/badge/new_code_gate-80%25_lines_90%25_branches-blue)](https://github.com/forever-hotel/infra/actions/workflows/ci.yml)
 
 Shared infrastructure for [Forever Hotel](https://github.com/forever-hotel), aligned with SENG 34213. Service repositories own code, Dockerfiles and image publication; this repository owns release manifests, host adoption, deployment and recovery. Shared acceptance checks live in [tests](https://github.com/forever-hotel/tests).
 

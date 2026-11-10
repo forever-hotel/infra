@@ -107,6 +107,15 @@ function hostFixture(mode = '') {
       ['a', 'b', 'c', 'd'].map((p) => [p, digest]),
     ),
     groups: {
+      sample: {
+        directory: '/opt/hotel-website-staging',
+        project: 'hotel-website-sample',
+        files: ['/opt/hotel-website-staging/compose.sample.yml'],
+        profiles: [],
+        envFile: null,
+        activeOverride:
+          '/opt/hotel-website-staging/.sample-release/active.json',
+      },
       full: {
         directory: '/opt/forever-hotel',
         project: 'forever-hotel-full',
@@ -282,7 +291,12 @@ for (const [service, profile] of Object.entries(profiles)) {
       const up = f.commands.find(
         (args) => args[0] === 'compose' && args.includes('up'),
       );
-      assert.deepEqual(up.slice(-profile.services.length), profile.services);
+      assert.deepEqual(
+        up.slice(-profile.services.length),
+        profile.services.map((name) =>
+          profile.group === 'sample' ? name.slice(3) : name,
+        ),
+      );
       assert.equal(
         f.commands.filter((args) => args[0] === 'curl').length,
         profile.publicOrigins.length * 2,
@@ -423,4 +437,48 @@ test('full infra release cannot silently replace a newer automatic service relea
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+test('Hotel Website updates only its existing sample project and preserves Caddy', async () => {
+  const f = hostFixture();
+  const original = f.io.json;
+  const publication = {
+    commit: sha,
+    backend:
+      'ghcr.io/forever-hotel/hotel-website/backend@sha256:' + 'f'.repeat(64),
+    frontend:
+      'ghcr.io/forever-hotel/hotel-website/frontend@sha256:' + 'e'.repeat(64),
+  };
+  f.io.json = async (path) =>
+    path === 'manifest'
+      ? publication
+      : path.endsWith('/active.json')
+        ? {
+            services: {
+              caddy: { image: 'caddy:2-alpine' },
+              gateway: { image: 'keep' },
+            },
+          }
+        : original(path);
+  await main(['manifest', sha, 'host', 'hw'], f.io);
+  const active = f.writes.get(
+    '/opt/hotel-website-staging/.sample-release/active.json',
+  );
+  assert.equal(active.services.caddy.image, 'caddy:2-alpine');
+  assert.equal(active.services.gateway.image, 'keep');
+  assert.equal(active.services.backend.image, publication.backend);
+  assert.equal(active.services.frontend.image, publication.frontend);
+  assert.equal(f.writes.has(f.state + '/active-images.json'), false);
+  const inspect = f.commands.filter((args) => args[0] === 'inspect');
+  assert.ok(
+    inspect.every((args) => args.at(-1).startsWith('hotel-website-sample-')),
+  );
+  const up = f.commands.find(
+    (args) => args[0] === 'compose' && args.includes('up'),
+  );
+  assert.ok(up.includes('hotel-website-sample'));
+  assert.deepEqual(up.slice(-2), ['backend', 'frontend']);
+  assert.ok(!up.includes('caddy'));
+  assert.ok(!up.includes('gateway'));
+  assert.equal(f.locks.size, 0);
 });

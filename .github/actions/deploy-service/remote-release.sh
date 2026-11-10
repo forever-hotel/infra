@@ -6,7 +6,7 @@ set -euo pipefail
 : "${SSH_KNOWN_HOSTS:?Set verified host entry}"
 [[ "$STAGING_HOST" = forever-hotel-staging.malaysiawest.cloudapp.azure.com ]]
 [[ "$STAGING_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
-[[ "$SERVICE" =~ ^(mad|fds|foss|wkms|kms|gateway|websocket)$ ]]
+[[ "$SERVICE" =~ ^(mad|fds|foss|wkms|kms|gateway|websocket|hw)$ ]]
 [[ "$GITHUB_SHA" =~ ^[a-f0-9]{40}$ ]]
 [[ "$GITHUB_RUN_ID" =~ ^[0-9]+$ && "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ ]]
 ssh_dir="$RUNNER_TEMP/service-ssh"

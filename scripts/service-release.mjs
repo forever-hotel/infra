@@ -138,6 +138,22 @@ export const profiles = {
     ],
   },
 };
+profiles.hw = {
+  repository: 'forever-hotel/hotel-website',
+  branch: 'develop',
+  group: 'sample',
+  services: ['hw-backend', 'hw-frontend'],
+  components: ['backend', 'frontend'],
+  publicOrigins: [
+    'https://forever-hotel-staging.malaysiawest.cloudapp.azure.com',
+  ],
+  probes: [
+    ['http://hotel-website-backend:3000/health/ready', [200]],
+    ['http://hotel-website-frontend:3001/', [200, 302, 303, 307, 308]],
+    ['http://127.0.0.1:8080/health/ready', [200]],
+    ['http://websocket:8081/health/ready', [200]],
+  ],
+};
 export function serviceProfile(service) {
   if (!Object.hasOwn(profiles, service))
     throw Error('Unknown deployment profile');
@@ -236,17 +252,27 @@ export async function main(
     service,
   );
   const host = await json(hostFile);
-  const group = host.groups?.full;
+  const sample = config.group === 'sample';
+  const group = host.groups?.[sample ? 'sample' : 'full'];
+  const expectedDirectory = sample
+    ? '/opt/hotel-website-staging'
+    : '/opt/forever-hotel';
+  const expectedProject = sample
+    ? 'hotel-website-sample'
+    : 'forever-hotel-full';
+  const expectedOverride = sample
+    ? '/opt/hotel-website-staging/.sample-release/active.json'
+    : '/opt/forever-hotel/.infra-release/active-images.json';
+  const composeName = (name) => (sample ? name.slice(3) : name);
   if (
     host.environment !== 'staging' ||
     host.adoptionApproved !== true ||
     host.stateDirectory !== '/opt/forever-hotel/.infra-release' ||
     host.sampleLock !==
       '/opt/hotel-website-staging/.sample-release/release.lock' ||
-    group?.directory !== '/opt/forever-hotel' ||
-    group.project !== 'forever-hotel-full' ||
-    group.activeOverride !==
-      '/opt/forever-hotel/.infra-release/active-images.json' ||
+    group?.directory !== expectedDirectory ||
+    group.project !== expectedProject ||
+    group.activeOverride !== expectedOverride ||
     !Array.isArray(group.files) ||
     !group.files.length ||
     !Array.isArray(group.profiles) ||
@@ -320,7 +346,7 @@ export async function main(
               'inspect',
               '--format',
               '{{json .}}',
-              group.project + '-' + name + '-1',
+              group.project + '-' + composeName(name) + '-1',
             ),
           );
           if (!info.State.Running || !/^sha256:[a-f0-9]{64}$/.test(info.Image))
@@ -368,7 +394,7 @@ export async function main(
       async replace(next) {
         await atomic(override, {
           services: Object.fromEntries(
-            names.map((name) => [name, { image: next[name] }]),
+            names.map((name) => [composeName(name), { image: next[name] }]),
           ),
         });
         compose(override, ['config', '--quiet']);
@@ -380,7 +406,7 @@ export async function main(
           '--pull',
           'never',
           '--force-recreate',
-          ...names,
+          ...names.map(composeName),
         ]);
       },
       async activate(next) {
@@ -396,7 +422,7 @@ export async function main(
           services: {
             ...current.services,
             ...Object.fromEntries(
-              names.map((name) => [name, { image: next[name] }]),
+              names.map((name) => [composeName(name), { image: next[name] }]),
             ),
           },
         });

@@ -4,11 +4,11 @@
 
 Each service runs its normal quality gates and final-code peer approval check. The publication job uploads immutable image references with the triggering source commit. A staging job calls the SHA-pinned infra action at .github/actions/deploy-service. It downloads the current run artifact and independently checks repository, branch, current head and final-head peer approval. No second infra PR is required for routine application releases.
 
-Manager Dashboard and WebSocket use development. Gateway, Food Ordering, Worker Management and Kitchen Management use develop. Front Desk retains its existing automatic staging job; Hotel Website retains Automatic sample staging. Production is unchanged.
+Manager Dashboard and WebSocket use development. Gateway, Food Ordering, Worker Management and Kitchen Management use develop. Front Desk retains its existing automatic staging job; Hotel Website now uses the shared action from its current publication workflow, targeting its existing sample project. Production is unchanged.
 
 ## Settings
 
-Each of the six new callers needs SERVICE_STAGING_ENABLED=true, STAGING_HOST=forever-hotel-staging.malaysiawest.cloudapp.azure.com and STAGING_USER=azureuser. Its staging environment permits only its release branch and holds encrypted STAGING_SSH_KEY and STAGING_KNOWN_HOSTS. There is no additional environment reviewer gate. User-authorized VM access is separate from public image metadata.
+Each shared-action caller needs SERVICE_STAGING_ENABLED=true, STAGING_HOST=forever-hotel-staging.malaysiawest.cloudapp.azure.com and STAGING_USER=azureuser. Its staging environment permits only its release branch and holds encrypted STAGING_SSH_KEY and STAGING_KNOWN_HOSTS. There is no additional environment reviewer gate. User-authorized VM access is separate from public image metadata.
 
 The shared action is pinned to an exact reviewed infra commit. Merge the infra action PR before approving the service PRs. A future action change requires testing and updating caller pins through reviewed service PRs. Public infra action code contains no credentials. Each service supplies its own job-scoped secrets.
 
@@ -29,3 +29,7 @@ Database/schema changes still require owner coordination and compatibility revie
 Watch the service repository's Actions run and Deploy service to staging job. PR runs validate but do not deploy. Approve the final service PR code and merge to the release branch, then confirm the publication, deployment and matching receipt. Test the changed business flow in the browser. First live rollout of these new callers remains pending their reviewed merges.
 
 Full-system staging rollout runs only when the reviewed infra merge changes release/current.json. Updating this shared action or its documentation alone validates the change without replacing containers.
+
+## Hotel Website sample project
+
+The hw profile deploys backend and frontend in /opt/hotel-website-staging with project hotel-website-sample. It uses the same full-system/sample locks but updates only .sample-release/active.json for that project. Caddy, gateway and all full-project containers remain unchanged. Hotel Website reuses its existing STAGING_SSH_KEY and STAGING_SSH_KNOWN_HOSTS secrets. The current publish-images.yml is extended; removed legacy deployment workflows are not restored. The owner's older local branch and uncommitted application/env changes are outside this deployment PR.

@@ -1,0 +1,9 @@
+{
+  "repository": "forever-hotel/websocket-service",
+  "branch": "development",
+  "commit": "f12ef41ba9fbbe7cfaf40970e4d4a8cb17b7de6d",
+  "image": "ghcr.io/forever-hotel/websocket-service@sha256:951fa629bfcd85d71b6def83e4710962cca106a97878798baedd0001b2443186",
+  "runUrl": "https://github.com/forever-hotel/websocket-service/actions/runs/42481679715",
+  "status": "images-published",
+  "verification": "User supplied successful GitHub Actions summary. Not yet deployed by infra."
+}

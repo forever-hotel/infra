@@ -1,0 +1,68 @@
+# Future full-system cutover configuration. Do not replace the running sample yet.
+# Caddy must share the full-system network; only Caddy publishes 80/443.
+
+(gateway_proxy) {
+    reverse_proxy gateway:8080 {
+        header_up X-Forwarded-For {remote_host}
+        header_up -X-User-Id
+        header_up -X-User-Role
+        header_up -X-Room-Number
+    }
+}
+
+forever-hotel-staging.malaysiawest.cloudapp.azure.com {
+    @gateway_paths path /auth /auth/* /hw /hw/* /realtime /realtime/*
+    handle @gateway_paths {
+        import gateway_proxy
+    }
+    # Keep /api/* and /_next/* on Next.js, including BFF authentication.
+    handle {
+        reverse_proxy hw-frontend:3001
+    }
+}
+
+forever-hotel-manager.duckdns.org {
+    @gateway_paths path /auth /auth/* /mad /mad/* /realtime /realtime/*
+    handle @gateway_paths {
+        import gateway_proxy
+    }
+    # Keep /api/* and /_next/* on Next.js, including BFF authentication.
+    handle {
+        reverse_proxy mad-frontend:3000
+    }
+}
+
+forever-hotel-frontdesk.duckdns.org {
+    @gateway_paths path /auth /auth/* /fds /fds/* /realtime /realtime/*
+    handle @gateway_paths {
+        import gateway_proxy
+    }
+    # Keep /api/* and /_next/* on Next.js, including BFF authentication.
+    handle {
+        reverse_proxy fds-frontend:3001
+    }
+}
+
+forever-hotel-food.duckdns.org {
+    @gateway_paths path /auth /auth/* /foss /foss/* /realtime /realtime/*
+    handle @gateway_paths {
+        import gateway_proxy
+    }
+    # Keep /api/* and /_next/* on Next.js, including BFF authentication.
+    handle {
+        reverse_proxy foss-frontend:3000
+    }
+}
+
+forever-hotel-workers.duckdns.org {
+    @gateway_paths path /auth /auth/* /wkms /wkms/* /realtime /realtime/*
+    handle @gateway_paths {
+        import gateway_proxy
+    }
+    # Keep /api/* and /_next/* on Next.js, including BFF authentication.
+    handle {
+        reverse_proxy wkms-frontend:3001
+    }
+}
+
+

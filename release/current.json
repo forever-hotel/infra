@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "version": null,
+  "stagingRunId": null,
+  "schemaEvidence": {
+    "reviewedReference": "PENDING: record reviewed shared schema and KMS outbox migration/triggers before adoption"
+  },
+  "images": {
+    "mad-backend": "ghcr.io/forever-hotel/manager-dashboard/backend@sha256:b653fe95db2260aaa7bcd8dcf4b842ad11e4760a2b298a8d7b3c6ddb01ee9dcc",
+    "mad-frontend": "ghcr.io/forever-hotel/manager-dashboard/frontend@sha256:b9f08f3e4e857c09ef4e7cb029f49db95055a357dd5b72ab12e3e9665344ba09",
+    "fds-backend": "ghcr.io/forever-hotel/front-desk/backend@sha256:2e2cb0a081cd19decd3d0655f21da9a7282365f1c5648eaaacdcc5590085e810",
+    "fds-frontend": "ghcr.io/forever-hotel/front-desk/frontend@sha256:c032b2c201633e2ab664b8078f9797e8ba840732376431d79864adc27d526c35",
+    "foss-backend": "ghcr.io/forever-hotel/food-ordering/backend@sha256:d9568a490b9e4ce420e818cc71642493f01de4dbaa65ee62dad54d6966cc97f1",
+    "foss-frontend": "ghcr.io/forever-hotel/food-ordering/frontend@sha256:022d4adb2ab864063672ed12c68870fbfd0590198dd195f3f4f9d60720661bce",
+    "wkms-backend": "ghcr.io/forever-hotel/worker-management/backend@sha256:aa0a41b67a3c5bdc058f3689dd96cf36d5e17e4354c6782948c47af2d0e9bdc4",
+    "wkms-frontend": "ghcr.io/forever-hotel/worker-management/frontend@sha256:dfd289af71627ec0075cca21a305e205aafdf7b2301deecb5553a0a25b95c522",
+    "kms-backend": "ghcr.io/forever-hotel/kitchen-management/backend@sha256:1f81d25f21603c91568b527bde9c0fd3d2d6500ed18ee12055a65ae3d98ba7e0",
+    "kms-frontend": "ghcr.io/forever-hotel/kitchen-management/frontend@sha256:aed29539527913eb04e98d3defe446e1abb06ead702bc4cf0b57155606605925",
+    "gateway": "ghcr.io/forever-hotel/api-gateway@sha256:363eccf592b8d7f24487d2b1c76ea74e49f9cbac39b8bfc4d4fbf5f0bcc6f77d",
+    "websocket": "ghcr.io/forever-hotel/websocket-service@sha256:951fa629bfcd85d71b6def83e4710962cca106a97878798baedd0001b2443186",
+    "hw-backend": "ghcr.io/forever-hotel/hotel-website/backend@sha256:700804b6f212c4f4394bdb2f8397b621dd36713370d719508e81c18ff58c8720",
+    "hw-frontend": "ghcr.io/forever-hotel/hotel-website/frontend@sha256:9fed69431ba287ae137811371d01b7479f36807e788409116039e01fddb83a3b"
+  }
+}

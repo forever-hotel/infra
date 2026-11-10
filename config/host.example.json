@@ -1,0 +1,57 @@
+{
+  "environment": "staging",
+  "adoptionApproved": false,
+  "stateDirectory": "/opt/forever-hotel/.infra-release",
+  "caddyFile": "/opt/hotel-website-staging/Caddyfile",
+  "gatewayContainer": "forever-hotel-full-gateway-1",
+  "sampleLock": "/opt/hotel-website-staging/.sample-release/release.lock",
+  "expectedConfigHashes": {},
+  "groups": {
+    "full": {
+      "directory": "/opt/forever-hotel",
+      "project": "forever-hotel-full",
+      "envFile": "/opt/forever-hotel/.env",
+      "files": [
+        "/opt/forever-hotel/compose.yml",
+        "/opt/forever-hotel/compose.sample-transition.yml",
+        "/opt/forever-hotel/compose.kms.yml"
+      ],
+      "profiles": ["platform", "mad", "fds", "foss", "wkms", "kms"],
+      "activeOverride": "/opt/forever-hotel/.infra-release/active-images.json"
+    },
+    "sample": {
+      "directory": "/opt/hotel-website-staging",
+      "project": "hotel-website-sample",
+      "envFile": null,
+      "files": ["/opt/hotel-website-staging/compose.sample.yml"],
+      "profiles": [],
+      "activeOverride": "/opt/hotel-website-staging/.sample-release/active.json"
+    }
+  },
+  "publicChecks": [
+    {
+      "url": "https://forever-hotel-staging.malaysiawest.cloudapp.azure.com/",
+      "statuses": [200, 302, 303, 307, 308]
+    },
+    {
+      "url": "https://forever-hotel-manager.duckdns.org/",
+      "statuses": [200, 302, 303, 307, 308]
+    },
+    {
+      "url": "https://forever-hotel-frontdesk.duckdns.org/",
+      "statuses": [200, 302, 303, 307, 308]
+    },
+    {
+      "url": "https://forever-hotel-food.duckdns.org/",
+      "statuses": [200, 302, 303, 307, 308]
+    },
+    {
+      "url": "https://forever-hotel-workers.duckdns.org/",
+      "statuses": [200, 302, 303, 307, 308]
+    },
+    {
+      "url": "https://forever-hotel-kitchen.duckdns.org/",
+      "statuses": [200, 302, 303, 307, 308]
+    }
+  ]
+}

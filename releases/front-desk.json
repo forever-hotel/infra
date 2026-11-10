@@ -1,0 +1,9 @@
+{
+  "repository": "forever-hotel/front-desk",
+  "branch": "develop",
+  "commit": "4b5ef57d4c4ce03c9ab2fe78f42b94eff96838cd",
+  "frontend": "ghcr.io/forever-hotel/front-desk/frontend@sha256:c032b2c201633e2ab664b8078f9797e8ba840732376431d79864adc27d526c35",
+  "backend": "ghcr.io/forever-hotel/front-desk/backend@sha256:2e2cb0a081cd19decd3d0655f21da9a7282365f1c5648eaaacdcc5590085e810",
+  "evidence": "User supplied successful publication summary; running image drift not independently checked.",
+  "deployment": "User reported HTTP connectivity; full functionality not verified"
+}

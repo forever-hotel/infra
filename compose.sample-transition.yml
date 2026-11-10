@@ -1,0 +1,73 @@
+{
+  "services": {
+    "gateway": {
+      "environment": {
+        "HW_SERVICE_URL": "http://hotel-website-backend:3000",
+        "TRUSTED_PROXIES": "172.30.80.254/32"
+      },
+      "networks": {
+        "services": {},
+        "sample_services": {
+          "aliases": [
+            "shared-gateway"
+          ]
+        },
+        "sample_edge": {
+          "aliases": [
+            "shared-gateway"
+          ]
+        }
+      }
+    },
+    "mad-frontend": {
+      "networks": {
+        "services": {},
+        "sample_edge": {
+          "aliases": [
+            "mad-frontend"
+          ]
+        }
+      }
+    },
+    "fds-frontend": {
+      "networks": {
+        "services": {},
+        "sample_edge": {
+          "aliases": [
+            "fds-frontend"
+          ]
+        }
+      }
+    },
+    "foss-frontend": {
+      "networks": {
+        "services": {},
+        "sample_edge": {
+          "aliases": [
+            "foss-frontend"
+          ]
+        }
+      }
+    },
+    "wkms-frontend": {
+      "networks": {
+        "services": {},
+        "sample_edge": {
+          "aliases": [
+            "wkms-frontend"
+          ]
+        }
+      }
+    }
+  },
+  "networks": {
+    "sample_edge": {
+      "external": true,
+      "name": "hotel-website-sample_edge"
+    },
+    "sample_services": {
+      "external": true,
+      "name": "forever-hotel-internal"
+    }
+  }
+}
